@@ -1,0 +1,56 @@
+﻿@*@model IEnumerable<MVC_Assignment4.Models.MusicGenre>*@
+@model PagedList.IPagedList<MVC_Assignment4.Models.MusicGenre>
+@using PagedList.Mvc;
+@using MVC_Assignment4.DAL;
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+
+@{
+    ViewBag.Title = "Index";
+	var db = new AlbumContext();
+	var artistCollection = db.Album;
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        @*<th>
+            @Html.DisplayNameFor(model => model.GenreType)
+        </th>
+        <th></th>*@
+		<th> @Html.ActionLink("Artist", "Index", new { sortOrder = ViewBag.GenreSortParm})</th>
+		<th> @Html.ActionLink("Genre Type", "Index", new { sortOrder = ViewBag.GenreSortParm})</th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+			@{
+				var artistName = artistCollection.Where(a => a.Id == item.Album.Id).Select(a => a.Artist).Single();
+			} 
+			@*@Html.DisplayFor( artistName => artistCollection.Where(a => a.Id == item.Album.Id).Single())*@
+			@artistName
+        </td>
+		<td>
+			@Html.DisplayFor(modelItem => item.GenreType)
+		</td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.MusicGenreId }) |
+            @Html.ActionLink("Details", "Details", new { id=item.MusicGenreId }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.MusicGenreId })
+        </td>
+    </tr>
+}
+
+</table>
+Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of
+@Model.PageCount
+@Html.PagedListPager(Model, page => Url.Action("Index",
+	new {
+		page,
+		sortOrder = ViewBag.CurrentSort,
+		currentFilter = ViewBag.CurrentFilter
+	}))
